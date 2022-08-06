@@ -153,7 +153,11 @@ func parameterToString(obj interface{}, collectionFormat string) string {
 		return t.Format(time.RFC3339)
 	}
 
-	return fmt.Sprintf("%v", obj)
+	objJson, err := parameterToJson(obj)
+	if err != nil {
+		return fmt.Sprintf("%v", obj)
+	}
+	return objJson
 }
 
 // helper for converting interface{} parameters to json strings
