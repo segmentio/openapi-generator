@@ -118,6 +118,13 @@ func (a *{{{classname}}}Service) {{nickname}}Execute(r {{#structPrefix}}{{&class
 		{{/returnType}}
 	)
 
+	type ResponseEnvelope struct {
+		{{#returnType}}
+		Data {{^isArray}}{{^returnTypeIsPrimitive}}*{{/returnTypeIsPrimitive}}{{/isArray}}{{{.}}} `json:"data"`
+		{{/returnType}}
+		Error error `json:"error"`
+	}
+
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "{{{classname}}}Service.{{{nickname}}}")
 	if err != nil {
 		return {{#returnType}}localVarReturnValue, {{/returnType}}nil, &GenericOpenAPIError{error: err.Error()}
@@ -379,13 +386,13 @@ func (a *{{{classname}}}Service) {{nickname}}Execute(r {{#structPrefix}}{{&class
 		if localVarHTTPResponse.StatusCode == {{{code}}} {
 		{{/wildcard}}
 		{{/range}}
-			var v {{{dataType}}}
+			var v ResponseEnvelope
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
 				return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+			newErr.model = v.Error
 			{{^-last}}
 			return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHTTPResponse, newErr
 			{{/-last}}
@@ -400,7 +407,8 @@ func (a *{{{classname}}}Service) {{nickname}}Execute(r {{#structPrefix}}{{&class
 	}
 
 	{{#returnType}}
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	var responseEnvelope ResponseEnvelope
+	err = a.client.decode(&responseEnvelope, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := &GenericOpenAPIError{
 			body:  localVarBody,
@@ -410,7 +418,7 @@ func (a *{{{classname}}}Service) {{nickname}}Execute(r {{#structPrefix}}{{&class
 	}
 
 	{{/returnType}}
-	return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHTTPResponse, nil
+	return {{#returnType}}responseEnvelope.Data, {{/returnType}}localVarHTTPResponse, responseEnvelope.Error
 }
 {{/operation}}
 {{/operations}}
