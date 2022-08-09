@@ -40,25 +40,25 @@ import * as apis from './api/apis';
 const YOUR_TOKEN = "YOUR_TOKEN"
 const STAGING_URL = "https://api.segmentapis.build"
 
-const workspaceApis = new apis.WorkspacesApi("https://api.segmentapis.com")
+const workspaceApis = new apis.WorkspacesApi(STAGING_URL)
 workspaceApis.accessToken = YOUR_TOKEN;
-workspaceApis.getWorkspaceAlphaLatest()
+workspaceApis.getWorkspaceCurrent()
 .then((result) => {
 console.log(`Result:\n ${JSON.stringify(result.body)}`);
 })
 .catch((error) => {
-console.log("ERROR:", error)
+console.log("ERROR\n:", error)
 }
 )
 
-const testApis = new apis.TestingApi("https://api.segmentapis.com")
+const testApis = new apis.TestingApi(STAGING_URL)
 testApis.accessToken = YOUR_TOKEN;
-testApis.echoAlphaLatest("Hello World")
+testApis.echoCurrent("Hello World")
 .then((result) => {
 console.log(`Result:\n ${JSON.stringify(result.body)}`);
 })
 .catch((error) => {
-console.log("ERROR", error)
+console.log("ERROR\n", error)
 }
 )
 
@@ -91,7 +91,7 @@ console.log("ERROR", error)
             const getWorkspace =  async()=>{
             const workspaceAPIs = new api.WorkspacesAPIs()
             workspace.accessToken = 'YOUR_TOKEN';
-            const result = await workspaceAPIs.getWorkspace()
+            const result = await workspaceAPIs.getWorkspaceCurrent()
             console.log(result.body)
             }
             ```
@@ -105,7 +105,7 @@ console.log("ERROR", error)
             ```typescript
             const getWorkspace =  async()=>{
             const workspaceAPIs = new api.WorkspacesAPIs('YOUR_USERNAME','YOUR_PASSWORD')
-            const result = await workspaceAPIs.getWorkspace()
+            const result = await workspaceAPIs.getWorkspaceCurrent()
             console.log(result.body)
             }
             ```
