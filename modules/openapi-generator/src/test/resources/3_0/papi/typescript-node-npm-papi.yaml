@@ -1,5 +1,5 @@
 generatorName: typescript-node
-outputDir: out/typescript-node-papi-10
+outputDir: out/typescript-node-papi
 inputSpec: input/api.json  # must be consistent with the api file name in run-in-docker.sh
 templateDir: modules/openapi-generator/src/main/resources/typescript-node
 additionalProperties:
