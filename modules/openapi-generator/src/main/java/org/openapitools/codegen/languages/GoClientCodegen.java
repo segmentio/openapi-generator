@@ -269,6 +269,7 @@ public class GoClientCodegen extends AbstractGoCodegen {
         supportingFiles.add(new SupportingFile(".travis.yml", "", ".travis.yml"));
         supportingFiles.add(new SupportingFile("utils.mustache", "", "utils.go"));
         supportingFiles.add(new SupportingFile("LICENSE.mustache", "", "LICENSE"));
+        supportingFiles.add(new SupportingFile("model_map.mustache", "", "model_map.go"));
     }
 
     public void setUseOneOfDiscriminatorLookup(boolean useOneOfDiscriminatorLookup) {

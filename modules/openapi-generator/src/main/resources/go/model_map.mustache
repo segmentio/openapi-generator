@@ -1,0 +1,45 @@
+{{>partial_header}}
+package {{packageName}}
+
+import "encoding/json"
+
+type ModelMap struct {
+	value map[string]interface{}
+	isSet bool
+}
+
+type NullableModelMap struct {
+	value *ModelMap
+	isSet bool
+}
+
+func (v NullableModelMap) Get() *ModelMap {
+	return v.value
+}
+
+func (v *NullableModelMap) Set(val *ModelMap) {
+	v.value = val
+	v.isSet = true
+}
+
+func (v NullableModelMap) IsSet() bool {
+	return v.isSet
+}
+
+func (v *NullableModelMap) Unset() {
+	v.value = nil
+	v.isSet = false
+}
+
+func NewNullableModelMap(val *ModelMap) *NullableModelMap {
+	return &NullableModelMap{value: val, isSet: true}
+}
+
+func (v NullableModelMap) MarshalJSON() ([]byte, error) {
+	return json.Marshal(v.value)
+}
+
+func (v *NullableModelMap) UnmarshalJSON(src []byte) error {
+	v.isSet = true
+	return json.Unmarshal(src, &v.value)
+}
