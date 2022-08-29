@@ -3,7 +3,7 @@ module.exports = {
         "<rootDir>/test"
     ],
     testTimeout: 20000,
-    testRegex: 'test/(.+)\\.test\\.(jsx?|tsx?)$',
+    testRegex: 'tests/test_(.+)\\.(jsx?|tsx?)$',
     transform: {
         "^.+\\.tsx?$": "ts-jest"
     },
