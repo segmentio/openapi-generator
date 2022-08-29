@@ -114,7 +114,7 @@ public class TypeScriptNodeClientCodegen extends AbstractTypeScriptClientCodegen
 
     @Override
     public String toApiTestFilename(String name) {
-        return "test_" + toApiFilename(name);
+        return toApiFilename(name)+".test";
     }
 
     @Override
