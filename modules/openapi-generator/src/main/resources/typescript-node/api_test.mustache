@@ -16,12 +16,15 @@ const UUID = consistentUUID("54521fd525e721e32a72ee91")
 async function makeClients(): Promise<{{classname}}> {
     return new Promise((resolve, reject) => {
         const server = http.createServer(function (req, res) {
+            let isUrlMatched = 0
             if(req.url) {
 {{#operations}}
     {{#operation}}
                 if (new RegExp('^{{{path}}}$'.split("/").join("\\/"){{#pathParams}}.replace('{' + '{{baseName}}' + '}',"[a-zA-Z0-9-]+"){{/pathParams}}).test(req.url)
                     && req.method == '{{httpMethod}}'
-                    && req.headers.accept == '{{{produces.0.mediaType}}}'){
+                    && req.headers.accept == '{{{produces.0.mediaType}}}'
+                    && isUrlMatched == 0){
+                    isUrlMatched = 1
                     res.writeHead(200, {'Content-Type': "application/json"});
                     res.end(JSON.stringify({
                         data:
@@ -30,9 +33,9 @@ async function makeClients(): Promise<{{classname}}> {
                 }
     {{/operation}}
 {{/operations}}
-            }else {
-                 res.writeHead(404, {"Content-Type": 'text/plain'});
-            }})
+            }
+            if (isUrlMatched == 0) res.writeHead(404, {"Content-Type": 'text/plain'});
+            })
         server.on('error', reject)
         server.listen(() => {
             const {port} = server.address() as AddressInfo
@@ -52,7 +55,7 @@ describe('test for {{classname}}', () => {
             {{#operation}}
         test('test {{operationId}}',  async() => {
         {{#allParams}} {{#isBodyParam}}{{#required}}
-            const bodyContent:models.{{{dataType}}} = {{{example}}}
+            const bodyContent:models.{{{dataType}}} = {{{example}}} as unknown as models.{{{dataType}}}
         {{/required}}{{/isBodyParam}}{{/allParams}}
             return  apis.{{operationId}}({{#allParams}}{{#isPathParam}}{{#required}}UUID,{{/required}}{{/isPathParam}}{{#isBodyParam}}{{#required}}bodyContent{{/required}}{{/isBodyParam}}{{/allParams}}).then(result =>{
                 expect(result.response).toBeTruthy()
