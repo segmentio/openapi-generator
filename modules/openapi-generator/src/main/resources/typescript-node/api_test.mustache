@@ -2,11 +2,10 @@ import * as models from '../model/models'
 import http from 'http'
 import { AddressInfo } from 'net'
 import { {{classname}} } from '../api/apis';
-import uuid from 'uuid/v5'
+import  { v5 as uuid } from 'uuid'
 const TEST_TOKEN = "1ba60ccaae1c1a5230"
 
 
-let defaultBasePath = '{{{basePath}}}';
 function consistentUUID(input: string): string {
     const base = '8504b9b8-326d-11ea-aec2-2e728ce88125'
     return uuid(input, base)}
