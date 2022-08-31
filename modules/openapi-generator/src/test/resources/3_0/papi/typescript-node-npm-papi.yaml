@@ -1,15 +1,10 @@
 generatorName: typescript-node
-outputDir: out/typescript-node-papi-24
+outputDir: out/typescript-node-papi
 inputSpec: modules/openapi-generator/src/test/resources/3_0/papi/open-api.json
-templateDir:  modules/openapi-generator/src/main/resources/typescript-node
+templateDir: modules/openapi-generator/src/main/resources/typescript-node
 additionalProperties:
   packageName: papi_sdk
   npmVersion: 0.0.1
   npmName: '@segment/papi_sdk' # define an npm name here
-files:
-  jest_config.mustache:
-    templateType: SupportingFiles
-    destinationFilename: jest.config.js
-  prettierrc.mustache:
-    templateType: SupportingFiles
-    destinationFilename: .prettierrc
+
+
