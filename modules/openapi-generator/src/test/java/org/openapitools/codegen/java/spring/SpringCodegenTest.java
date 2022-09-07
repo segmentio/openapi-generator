@@ -106,9 +106,10 @@ public class SpringCodegenTest {
 
         JavaFileAssert.assertThat(Paths.get(outputPath + "/src/main/java/org/openapitools/api/ZebrasApi.java"))
             .assertTypeAnnotations()
-                .hasSize(3)
+                .hasSize(4)
                 .containsWithName("Validated")
                 .containsWithName("Generated")
+                .containsWithName("RequestMapping")
                 .containsWithNameAndAttributes("Generated", ImmutableMap.of(
                     "value", "\"org.openapitools.codegen.languages.SpringCodegen\""
                 ))
@@ -653,6 +654,22 @@ public class SpringCodegenTest {
         assertFileContains(multipartApi.toPath(),
                "List<MultipartFile> files",
                "MultipartFile file");
+    }
+    
+    @Test
+    public void testRequestMappingAnnotation() throws IOException {
+        final SpringCodegen codegen = new SpringCodegen();
+        codegen.setLibrary("spring-boot");
+
+        final Map<String, File> files = generateFiles(codegen, "src/test/resources/2_0/petstore.yaml");
+
+        // Check that the @RequestMapping annotation is generated in the Api file
+        final File petApiFile = files.get("PetApi.java");
+        assertFileContains(petApiFile.toPath(), "@RequestMapping(\"${openapi.openAPIPetstore.base-path:/v2}\")");
+
+        // Check that the @RequestMapping annotation is not generated in the Controller file
+        final File petApiControllerFile = files.get("PetApiController.java");
+        assertFileNotContains(petApiControllerFile.toPath(), "@RequestMapping(\"${openapi.openAPIPetstore.base-path:/v2}\")");
     }
 
     @Test
@@ -1459,110 +1476,28 @@ public class SpringCodegenTest {
     }
 
     @Test
-    public void shouldGenerateSingleOperationWithDifferentReturnTypes() throws IOException {
+    public void shouldGenerateDiscriminatorFromAllOfWhenUsingLegacyDiscriminatorBehaviour_issue12692() throws IOException {
         File output = Files.createTempDirectory("test").toFile().getCanonicalFile();
         output.deleteOnExit();
 
         OpenAPI openAPI = new OpenAPIParser()
-            .readLocation("src/test/resources/bugs/issue_8700.yaml", null, new ParseOptions()).getOpenAPI();
+                .readLocation("src/test/resources/bugs/issue_12692.yml", null, new ParseOptions()).getOpenAPI();
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
-        codegen.additionalProperties().put(SpringCodegen.USE_TAGS, "true");
         codegen.setOutputDir(output.getAbsolutePath());
+        codegen.additionalProperties().put(CodegenConstants.LEGACY_DISCRIMINATOR_BEHAVIOR, "true");
 
         ClientOptInput input = new ClientOptInput()
-            .openAPI(openAPI)
-            .config(codegen);
+                .openAPI(openAPI)
+                .config(codegen);
 
         DefaultGenerator generator = new DefaultGenerator();
-        Map<String, File> files = generator.opts(input).generate().stream()
-            .collect(Collectors.toMap(File::getName, Function.identity()));
+        generator.opts(input).generate();
 
-        JavaFileAssert.assertThat(files.get("TestControllerApi.java"))
-            .assertMethod("operationWithDifferentReturnType")
-                .hasReturnType("ResponseEntity<ResponseObject>")
-                .assertMethodAnnotations()
-                .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"application/hal+json\", \"application/json\", \"text/xml\" }"))
-            .toMethod()
-            .toFileAssert()
-            .assertMethod("operationWithSameReturnType")
-                .hasReturnType("ResponseEntity<ResponseObject>")
-                .assertMethodAnnotations()
-                .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"application/hal+json\", \"application/json\", \"text/xml\" }"))
-            .toMethod()
-            .toFileAssert()
-            .assertMethod("operationWithSingleReturnType")
-                .hasReturnType("ResponseEntity<ResponseObject>")
-                .assertMethodAnnotations()
-                .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"application/hal+json\" }"));
+        String jsonTypeInfo = "@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = \"type\", visible = true)";
+        String jsonSubType = "@JsonSubTypes({\n" +
+                             "  @JsonSubTypes.Type(value = Cat.class, name = \"cat\")" +
+                             "})";
+        assertFileContains(Paths.get(output.getAbsolutePath() + "/src/main/java/org/openapitools/model/Pet.java"), jsonTypeInfo, jsonSubType);
     }
-
-//    @Test
-//    public void shouldSplitOperationsByDifferentReturnTypes() throws IOException {
-//        File output = Files.createTempDirectory("test").toFile().getCanonicalFile();
-//        output.deleteOnExit();
-//
-//        GlobalSettings.setProperty(CodegenConstants.SPLIT_RESPONSE_TYPES, "true");
-//
-//        try {
-//            OpenAPI openAPI = new OpenAPIParser()
-//                .readLocation("src/test/resources/bugs/issue_8700.yaml", null, new ParseOptions()).getOpenAPI();
-//            SpringCodegen codegen = new SpringCodegen();
-//            codegen.setLibrary(SPRING_BOOT);
-//            codegen.additionalProperties().put(SpringCodegen.USE_TAGS, "true");
-//            codegen.setOutputDir(output.getAbsolutePath());
-//
-//            ClientOptInput input = new ClientOptInput()
-//                .openAPI(openAPI)
-//                .config(codegen);
-//
-//            DefaultGenerator generator = new DefaultGenerator();
-//            Map<String, File> files = generator.opts(input).generate().stream()
-//                .collect(Collectors.toMap(File::getName, Function.identity()));
-//
-//            JavaFileAssert.assertThat(files.get("TestControllerApi.java"))
-//                .assertMethod("operationWithSameReturnTypeApplicationHaljson")
-//                    .hasReturnType("ResponseEntity<ResponseObject>")
-//                    .assertMethodAnnotations()
-//                    .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"application/hal+json\" }"))
-//                .toMethod()
-//                .toFileAssert()
-//                .assertMethod("operationWithSameReturnTypeApplicationJson")
-//                    .hasReturnType("ResponseEntity<ResponseObject>")
-//                    .assertMethodAnnotations()
-//                    .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"application/json\" }"))
-//                .toMethod()
-//                .toFileAssert()
-//                .assertMethod("operationWithSameReturnTypeTextXml")
-//                    .hasReturnType("ResponseEntity<ResponseObject>")
-//                    .assertMethodAnnotations()
-//                    .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"text/xml\" }"))
-//                .toMethod()
-//                .toFileAssert()
-//                .assertMethod("operationWithDifferentReturnTypeApplicationHaljson")
-//                    .hasReturnType("ResponseEntity<ResponseObject>")
-//                    .assertMethodAnnotations()
-//                    .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"application/hal+json\" }"))
-//                .toMethod()
-//                .toFileAssert()
-//                .assertMethod("operationWithDifferentReturnTypeApplicationJson")
-//                    .hasReturnType("ResponseEntity<String>")
-//                    .assertMethodAnnotations()
-//                    .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"application/json\" }"))
-//                .toMethod()
-//                .toFileAssert()
-//                .assertMethod("operationWithDifferentReturnTypeTextXml")
-//                    .hasReturnType("ResponseEntity<org.springframework.core.io.Resource>")
-//                    .assertMethodAnnotations()
-//                    .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"text/xml\" }"))
-//                .toMethod()
-//                .toFileAssert()
-//                .assertMethod("operationWithSingleReturnType")
-//                    .hasReturnType("ResponseEntity<ResponseObject>")
-//                    .assertMethodAnnotations()
-//                    .containsWithNameAndAttributes("RequestMapping", ImmutableMap.of("produces", "{ \"application/hal+json\" }"));
-//        } finally {
-//            GlobalSettings.setProperty(CodegenConstants.SPLIT_RESPONSE_TYPES, "false");
-//        }
-//    }
 }
