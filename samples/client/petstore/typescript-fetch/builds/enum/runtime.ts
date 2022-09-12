@@ -193,7 +193,11 @@ export class BaseAPI {
                 }
             }
             if (response === undefined) {
+              if (e instanceof Error) {
                 throw new FetchError(e, 'The request failed and the interceptors did not return an alternative response');
+              } else {
+                throw e;
+              }
             }
         }
         for (const middleware of this.middleware) {
@@ -230,21 +234,21 @@ function isFormData(value: any): value is FormData {
 }
 
 export class ResponseError extends Error {
-    name: "ResponseError" = "ResponseError";
+    override name: "ResponseError" = "ResponseError";
     constructor(public response: Response, msg?: string) {
         super(msg);
     }
 }
 
 export class FetchError extends Error {
-    name: "FetchError" = "FetchError";
-    constructor(public cause: unknown, msg?: string) {
+    override name: "FetchError" = "FetchError";
+    constructor(public cause: Error, msg?: string) {
         super(msg);
     }
 }
 
 export class RequiredError extends Error {
-    name: "RequiredError" = "RequiredError";
+    override name: "RequiredError" = "RequiredError";
     constructor(public field: string, msg?: string) {
         super(msg);
     }
