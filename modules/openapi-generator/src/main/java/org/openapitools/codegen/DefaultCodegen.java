@@ -7330,7 +7330,7 @@ public class DefaultCodegen implements CodegenConfig {
         Set<String> mandatory = schema.getRequired() == null ? Collections.emptySet()
                 : new TreeSet<>(schema.getRequired());
         addVars(property, property.getVars(), schema.getProperties(), mandatory);
-//        addRequiredVarsMap(schema, property);
+        addRequiredVarsMap(schema, property);
     }
 
     private void addJsonSchemaForBodyRequestInCaseItsNotPresent(CodegenParameter codegenParameter, RequestBody body) {
