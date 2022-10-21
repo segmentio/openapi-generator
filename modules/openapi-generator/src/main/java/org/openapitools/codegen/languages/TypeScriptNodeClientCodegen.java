@@ -69,7 +69,6 @@ public class TypeScriptNodeClientCodegen extends AbstractTypeScriptClientCodegen
         apiTemplateFiles.put("api-single.mustache", ".ts");
         modelPackage = "model";
         apiPackage = "api";
-        testPackage = "tests";
         supportModelPropertyNaming(CodegenConstants.MODEL_PROPERTY_NAMING_TYPE.camelCase);
         this.cliOptions.add(new CliOption(NPM_REPOSITORY, "Use this property to set an url your private npmRepo in the package.json"));
 
@@ -109,11 +108,6 @@ public class TypeScriptNodeClientCodegen extends AbstractTypeScriptClientCodegen
     protected void handleMethodResponse(Operation operation, Map<String, Schema> schemas, CodegenOperation op,
                                         ApiResponse methodResponse) {
         handleMethodResponse(operation, schemas, op, methodResponse, Collections.emptyMap());
-    }
-
-    @Override
-    public String toApiTestFilename(String name) {
-        return toApiFilename(name)+".test";
     }
 
     @Override
