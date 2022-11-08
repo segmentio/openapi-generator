@@ -219,7 +219,7 @@ public class Swift5ClientCodegen extends DefaultCodegen implements CodegenConfig
 
         typeMapping = new HashMap<>();
         typeMapping.put("array", "Array");
-        typeMapping.put("map", "Dictionary");
+        typeMapping.put("map", "JSON");
         typeMapping.put("set", "Set");
         typeMapping.put("date", "Date");
         typeMapping.put("Date", "Date");
@@ -584,6 +584,9 @@ public class Swift5ClientCodegen extends DefaultCodegen implements CodegenConfig
         supportingFiles.add(new SupportingFile("swiftformat.mustache",
                 "",
                 ".swiftformat"));
+        supportingFiles.add(new SupportingFile("JSON.mustache",
+        sourceFolder + File.separator + "Models",
+                "JSON.swift"));
 
         switch (getLibrary()) {
             case LIBRARY_ALAMOFIRE:
