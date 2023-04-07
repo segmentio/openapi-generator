@@ -4,7 +4,7 @@
   <artifactId>microprofile-rest-client</artifactId>
   <packaging>jar</packaging>
   <name>microprofile-rest-client</name>
-  <description>This is a sample server Petstore server. For this sample, you can use the api key &#x60;special-key&#x60; to test the authorization filters.</description>
+  <description>This is a sample server Petstore server. For this sample, you can use the api key `special-key` to test the authorization filters.</description>
   <version>1.0.0</version>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
@@ -167,7 +167,7 @@
     <smallrye.config.version>1.3.5</smallrye.config.version>
     <cxf.rt.rs.extension.providers.version>3.2.6</cxf.rt.rs.extension.providers.version>
     <jaxb.core.version>2.2.11</jaxb.core.version>
-    <jaxb.impl.version>2.2.11</jaxb.impl.version>
+    <jaxb.impl.version>2.3.8</jaxb.impl.version>
     <hibernate.validator.version>5.2.2.Final</hibernate.validator.version>
     <jandex.maven.plugin.version>1.1.0</jandex.maven.plugin.version>
     <maven.failsafe.plugin.version>2.6</maven.failsafe.plugin.version>
